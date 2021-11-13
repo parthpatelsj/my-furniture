@@ -1,4 +1,8 @@
 import React, { useEffect, useState } from "react";
+import ImageUploading from 'react-images-uploading';
+import * as THREE from "three";
+
+
 import {
   ControlsContainer,
   RadioButton,
@@ -15,6 +19,21 @@ const Controls = ({ Scene3D }) => {
   const [total, setTotal] = useState(300);
   const [realWidth, setRealWidth] = useState(6);
   const [controlsOpen, setControlsOpen] = useState(false);
+  const maxNumber = 69;
+
+
+  const loader = new THREE.TextureLoader();
+
+
+  const changeTableTopTexutre = (img) => {
+    const object = Scene3D.scene.getObjectByName( "top-plane" );
+    var texture = new THREE.TextureLoader().load( img );
+    const newMaterial = new THREE.MeshBasicMaterial({
+      map: texture,
+    });
+    object.material = newMaterial;
+
+  }
 
   const changeTopSize = (part1, part2, position, width) => {
     const currentItems = Scene3D.scene.children.filter(
@@ -39,6 +58,25 @@ const Controls = ({ Scene3D }) => {
       item.position.set(item.position.x, sub, item.position.z);
       Scene3D.renderer.render(Scene3D.scene, Scene3D.camera);
     });
+  };
+
+  const uploadedImage = React.useRef(null);
+  const imageUploader = React.useRef(null);
+
+  const handleImageUpload = e => {
+    const [file] = e.target.files;
+    if (file) {
+      const reader = new FileReader();
+      const { current } = uploadedImage;
+      current.file = file;
+      reader.onload = e => {
+        current.src = e.target.result;
+        changeTableTopTexutre(current.src);
+
+      };
+      reader.readAsDataURL(file);
+    }
+
   };
 
   useEffect(() => {
@@ -76,45 +114,53 @@ const Controls = ({ Scene3D }) => {
         src="../../cancel.png"
         alt="Settings"
       />
-      <RadioButton>
-        <label>Top Plane Width</label>
-        <input
-          type="range"
-          min="0"
-          max="40"
-          value={topWidth}
-          step="0.01"
-          onChange={(e) => setTopWidth(e.target.value)}
-        />
-      </RadioButton>
-
-      <RadioButton>
-        <label>Top Plane Depth</label>
-        <input
-          type="range"
-          min="0"
-          max="40"
-          value={topDepth}
-          step="0.01"
-          onChange={(e) => setTopDepth(e.target.value)}
-        />
-      </RadioButton>
-
-      <RadioButton>
-        <label>Change height</label>
-        <input
-          type="range"
-          min="1"
-          max="2"
-          value={sideHeight}
-          step="0.01"
-          onChange={(e) => setSideHeight(e.target.value)}
-        />
-      </RadioButton>
-      <Colors Scene3D={Scene3D} />
+     
       <Total>
-        <p>Total: {Math.round(total)}</p>
+        <p>Total: $500</p>
       </Total>
+
+
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center"
+      }}
+    >
+      <input
+        type="file"
+        accept="image/*"
+        onChange={handleImageUpload}
+        ref={imageUploader}
+        style={{
+          display: "none"
+        }}
+      />
+      <div
+        style={{
+          height: "60px",
+          width: "60px",
+          border: "1px dashed black"
+        }}
+        onClick={() => imageUploader.current.click()}
+      >
+        <img
+          ref={uploadedImage}
+          style={{
+            width: "100%",
+            height: "100%",
+            position: "acsolute"
+          }}
+        />
+      </div>
+      <span
+        style={{
+          color: "white"
+        }}
+        >Click to upload Image</span>
+    </div>
+
     </ControlsContainer>
   ) : (
     <SettingsButton

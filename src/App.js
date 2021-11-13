@@ -5,8 +5,8 @@ function App() {
   return (
     <AppContainer>
       <Header>
-        <LogoImage src="./tape-measure.png" />
-        <p>Design your table</p>
+        <LogoImage src="./logo.png" />
+        <p>Design Studio</p>
       </Header>
       <Builder />
     </AppContainer>
